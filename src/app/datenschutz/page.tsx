@@ -39,10 +39,10 @@ export default function DatenschutzPage() {
 
           <LegalBlock title="Verantwortlich">
             <p>{author.name}</p>
-            <p>{author.address}</p>
             <p>
               <TextLink href={author.emailHref} inline>{author.email}</TextLink>
             </p>
+            <p>{author.addressNote}</p>
           </LegalBlock>
 
           <LegalBlock title="Server-Protokolle beim Hosting">

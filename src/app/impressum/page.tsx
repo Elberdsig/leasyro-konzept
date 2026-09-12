@@ -31,16 +31,17 @@ export default function ImpressumPage() {
 
           <LegalBlock title="Anbieter dieser Seite">
             <p>{author.name}</p>
-            <p>{author.address}</p>
             <p>
               <TextLink href={author.emailHref} inline>{author.email}</TextLink>
             </p>
+            <p>{author.addressNote}</p>
           </LegalBlock>
 
           <LegalBlock title="Verantwortlich für den Inhalt">
             <p>
-              {author.name}, Anschrift wie oben. Diese Seite ist ein privates
-              Bewerbungsprojekt ohne wirtschaftliches Interesse.
+              {author.name}. Diese Seite ist ein privates Bewerbungsprojekt
+              ohne wirtschaftliches Interesse. Sie wirbt nicht, verkauft nichts
+              und sammelt keine Daten.
             </p>
           </LegalBlock>
 

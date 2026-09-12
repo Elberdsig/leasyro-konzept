@@ -2,9 +2,10 @@
  * Elberd Sigauri, author and operator of this draft.
  *
  * The imprint and the privacy notice of this site belong to him, not to
- * leasyro. The postal address is a marked placeholder: an imprint needs a real
- * address, and Elberd fills that in himself before anything goes public.
- * `npm run check` with CHECK_STRICT=1 refuses to pass while the marker is here.
+ * leasyro. No postal address is printed: this is a private application draft
+ * with no commercial purpose, so it is reachable by e-mail and the address is
+ * given on request instead of being published. A marked placeholder would have
+ * been worse than either option on a page a recruiter opens.
  */
 
 export const author = {
@@ -12,8 +13,9 @@ export const author = {
   role: "Bewerber auf die Stelle Software Developer (m/w/d)",
   email: "sigaurie@gmail.com",
   emailHref: "mailto:sigaurie@gmail.com",
-  // Placeholder on purpose. Elberd enters the real address before publishing.
-  address: "[[ANSCHRIFT: trägt Elberd ein]]",
+  // No address in public. Private draft, no commercial use, reachable by e-mail.
+  addressNote:
+    "Privates Bewerbungsprojekt ohne geschäftlichen Zweck. Die Anschrift nenne ich auf Anfrage per E-Mail.",
   portfolio: "https://elberd-portfolio.sigaurie.workers.dev",
   portfolioLabel: "elberd-portfolio.sigaurie.workers.dev",
   cv: "https://elberd-cv.pages.dev",

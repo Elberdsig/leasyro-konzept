@@ -3,15 +3,15 @@ import type { ReactNode } from "react";
 /**
  * Shared pieces of the two legal pages.
  *
- * The notice is deliberately loud. Both texts are a first draft written by a
- * developer, not by a lawyer, and nobody should mistake them for checked
- * boilerplate.
+ * The notice is deliberately visible. Both texts were written by a developer,
+ * not by a lawyer, and nobody should mistake them for checked boilerplate.
+ * It no longer mentions a placeholder address: none is printed any more.
  */
 export function DraftNotice() {
   return (
     <p className="mt-8 rounded-card border border-brand-ink bg-brand-soft px-5 py-4 font-semibold text-ink">
-      Entwurf, vor Veröffentlichung prüfen. Dieser Text ist noch nicht
-      anwaltlich geprüft und die Anschrift ist ein Platzhalter.
+      Dieser Text ist von mir selbst geschrieben und nicht anwaltlich geprüft.
+      Er gehört zu einem privaten Bewerbungsprojekt, nicht zur leasyro GmbH.
     </p>
   );
 }

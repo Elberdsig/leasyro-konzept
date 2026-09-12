@@ -94,7 +94,7 @@ export const comparison: ComparisonRow[] = [
   {
     metric: "Lighthouse mobil, Performance",
     before: "71, Largest Contentful Paint 11,2 s",
-    after: "99, Largest Contentful Paint 2,2 s",
+    after: "100, Largest Contentful Paint 0,9 s",
   },
   {
     metric: "Lighthouse mobil, Barrierefreiheit",
@@ -119,7 +119,7 @@ export const comparison: ComparisonRow[] = [
 ];
 
 export const comparisonNote =
-  "Beide Spalten habe ich am 12.09.2026 mit demselben Skript gemessen: Playwright mit System-Chrome, Desktop 1440 px und Handy 390 px, dazu Lighthouse 13 auf dem Handy-Profil. Die Übertragung zählt alle Antworten des ersten Aufrufs ohne Cache.";
+  "Beide Spalten habe ich am 12.09.2026 mit demselben Skript gemessen: Playwright mit System-Chrome, Desktop 1440 px und Handy 390 px, dazu Lighthouse 13 auf dem Handy-Profil, jeweils gegen die veröffentlichte Seite. Die Übertragung zählt alle Antworten des ersten Aufrufs ohne Cache.";
 
 export type ChangeItem = {
   title: string;
