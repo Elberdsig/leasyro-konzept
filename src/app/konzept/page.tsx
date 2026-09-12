@@ -11,13 +11,22 @@ import {
   omitted,
   stack,
 } from "@/content/concept";
+import {
+  ideas,
+  ideasIntro,
+  qualityGates,
+  qualityIntro,
+  timeline,
+  timelineIntro,
+} from "@/content/concept-ideas";
 import { Container, Eyebrow, Section, TextLink } from "@/components/ui";
 
 export const metadata: Metadata = {
   title: "Das Konzept",
   description:
     "Warum es diesen Entwurf gibt, was sich geändert hat und was gemessen wurde. Von Elberd Sigauri.",
-};
+  alternates: { canonical: "/konzept" },
+}
 
 /**
  * The page this whole repository exists for.
@@ -48,9 +57,9 @@ export default function KonzeptPage() {
         </Container>
       </Section>
 
-      <Section tone="paper-2">
+      <Section tone="paper-2" className="reveal">
         <Container>
-          <h2 className="text-2xl font-semibold sm:text-3xl">
+          <h2 className="text-2xl font-semibold text-balance sm:text-3xl">
             Vorher und nachher
           </h2>
           <p className="mt-3 max-w-3xl text-ink-soft">{comparisonNote}</p>
@@ -82,10 +91,10 @@ export default function KonzeptPage() {
                     >
                       {row.metric}
                     </th>
-                    <td className="px-5 py-4 align-top text-ink-soft">
+                    <td className="px-5 py-4 align-top tabular-nums text-ink-soft">
                       {row.before}
                     </td>
-                    <td className="px-5 py-4 align-top font-semibold text-brand-ink">
+                    <td className="px-5 py-4 align-top font-semibold tabular-nums text-brand-ink">
                       {row.after}
                     </td>
                   </tr>
@@ -96,9 +105,9 @@ export default function KonzeptPage() {
         </Container>
       </Section>
 
-      <Section>
+      <Section className="reveal">
         <Container>
-          <h2 className="text-2xl font-semibold sm:text-3xl">
+          <h2 className="text-2xl font-semibold text-balance sm:text-3xl">
             Was ich geändert habe
           </h2>
           <dl className="mt-8 grid gap-x-12 gap-y-8 lg:grid-cols-2">
@@ -114,11 +123,11 @@ export default function KonzeptPage() {
         </Container>
       </Section>
 
-      <Section tone="paper-2">
+      <Section tone="paper-2" className="reveal">
         <Container>
           <div className="grid gap-12 lg:grid-cols-2 lg:gap-16">
             <div>
-              <h2 className="text-2xl font-semibold sm:text-3xl">
+              <h2 className="text-2xl font-semibold text-balance sm:text-3xl">
                 Was gleich geblieben ist
               </h2>
               <ul className="mt-6 space-y-3">
@@ -137,7 +146,7 @@ export default function KonzeptPage() {
             </div>
 
             <div>
-              <h2 className="text-2xl font-semibold sm:text-3xl">
+              <h2 className="text-2xl font-semibold text-balance sm:text-3xl">
                 Was ich bewusst weggelassen habe
               </h2>
               <dl className="mt-6 space-y-5">
@@ -155,11 +164,129 @@ export default function KonzeptPage() {
         </Container>
       </Section>
 
-      <Section>
+      {/*
+        The three blocks below are filled from src/content/concept-ideas.ts.
+        Each one renders only when its array has entries: the copy is written
+        separately from the layout, and a half filled content file must never
+        leave an empty headline standing on the page.
+      */}
+      {ideas.length > 0 ? (
+        <Section className="reveal">
+          <Container>
+            <div className="max-w-3xl">
+              <h2 className="text-2xl font-semibold text-balance sm:text-3xl">
+                {ideasIntro.title}
+              </h2>
+              <p className="mt-3 leading-relaxed text-ink-soft">
+                {ideasIntro.lead}
+              </p>
+            </div>
+
+            <ul className="mt-9 border-t border-line">
+              {ideas.map((idea) => (
+                <li key={idea.title} className="border-b border-line py-7">
+                  <div className="flex flex-wrap items-baseline justify-between gap-x-8 gap-y-2">
+                    <h3 className="text-xl font-semibold">{idea.title}</h3>
+                    <p className="eyebrow text-ink-faint">
+                      Aufwand: {idea.effort}
+                    </p>
+                  </div>
+                  <div className="mt-5 grid gap-x-12 gap-y-5 md:grid-cols-2">
+                    <div>
+                      <p className="eyebrow text-ink-faint">Warum</p>
+                      <p className="mt-2 leading-relaxed text-ink-soft">
+                        {idea.why}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="eyebrow text-ink-faint">Wie</p>
+                      <p className="mt-2 leading-relaxed text-ink-soft">
+                        {idea.how}
+                      </p>
+                    </div>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </Container>
+        </Section>
+      ) : null}
+
+      {timeline.length > 0 ? (
+        <Section tone="paper-2" className="reveal">
+          <Container>
+            <div className="max-w-3xl">
+              <h2 className="text-2xl font-semibold text-balance sm:text-3xl">
+                {timelineIntro.title}
+              </h2>
+              <p className="mt-3 leading-relaxed text-ink-soft">
+                {timelineIntro.lead}
+              </p>
+            </div>
+
+            <ol className="mt-9 max-w-3xl">
+              {timeline.map((step, index) => {
+                const last = index === timeline.length - 1;
+                return (
+                  <li
+                    key={`${step.when}-${index}`}
+                    className="grid grid-cols-[3.5rem_1fr] gap-x-4 sm:grid-cols-[5rem_1fr] sm:gap-x-6"
+                  >
+                    <p className="text-right font-semibold tabular-nums text-ink">
+                      {step.when}
+                    </p>
+                    <div
+                      className={`relative border-l border-line pl-6 ${
+                        last ? "pb-1" : "pb-7"
+                      }`}
+                    >
+                      <span
+                        aria-hidden="true"
+                        className="absolute top-2 -left-[4.5px] h-2 w-2 rounded-pill bg-brand-ink"
+                      />
+                      <p className="leading-relaxed text-ink-soft">
+                        {step.what}
+                      </p>
+                    </div>
+                  </li>
+                );
+              })}
+            </ol>
+          </Container>
+        </Section>
+      ) : null}
+
+      {qualityGates.length > 0 ? (
+        <Section tone="brand-soft" className="reveal">
+          <Container>
+            <div className="max-w-3xl">
+              <h2 className="text-2xl font-semibold text-balance sm:text-3xl">
+                {qualityIntro.title}
+              </h2>
+              <p className="mt-3 leading-relaxed text-ink-soft">
+                {qualityIntro.lead}
+              </p>
+            </div>
+
+            <dl className="mt-9 grid gap-x-14 gap-y-8 sm:grid-cols-2">
+              {qualityGates.map((gate) => (
+                <div key={gate.title}>
+                  <dt className="font-semibold text-ink">{gate.title}</dt>
+                  <dd className="mt-2 leading-relaxed text-ink-soft">
+                    {gate.text}
+                  </dd>
+                </div>
+              ))}
+            </dl>
+          </Container>
+        </Section>
+      ) : null}
+
+      <Section className="reveal">
         <Container>
           <div className="grid gap-12 lg:grid-cols-[5fr_7fr] lg:gap-16">
             <div>
-              <h2 className="text-2xl font-semibold sm:text-3xl">
+              <h2 className="text-2xl font-semibold text-balance sm:text-3xl">
                 Stack und Arbeitsweise
               </h2>
               <p className="mt-4 leading-relaxed text-ink-soft">
@@ -176,6 +303,9 @@ export default function KonzeptPage() {
               {stack.map((item) => (
                 <li
                   key={item}
+                  // Product names. A browser translation that turns "Server
+                  // Components" into something else makes the list wrong.
+                  translate="no"
                   className="rounded-card border border-line bg-paper-2 px-4 py-3 text-ink-soft"
                 >
                   {item}
@@ -186,7 +316,7 @@ export default function KonzeptPage() {
         </Container>
       </Section>
 
-      <Section tone="navy">
+      <Section tone="navy" className="reveal">
         <Container>
           <div className="max-w-3xl">
             <Eyebrow tone="light">{aboutElberd.eyebrow}</Eyebrow>
@@ -226,11 +356,11 @@ export default function KonzeptPage() {
         </Container>
       </Section>
 
-      <section className="border-t border-line bg-brand-soft py-14">
+      <section className="reveal border-t border-line bg-brand-soft py-14">
         <Container>
           <div className="max-w-2xl">
             <Eyebrow>Kontakt</Eyebrow>
-            <h2 className="mt-3 text-2xl font-semibold sm:text-3xl">
+            <h2 className="mt-3 text-2xl font-semibold text-balance sm:text-3xl">
               Schreib mir
             </h2>
             <p className="mt-3 text-ink-soft">{aboutElberd.contactLead}</p>

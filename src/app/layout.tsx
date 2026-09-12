@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Poppins } from "next/font/google";
 import { ConceptBanner } from "@/components/concept-banner";
 import { SiteFooter } from "@/components/site-footer";
@@ -38,6 +38,14 @@ export const metadata: Metadata = {
     description: siteMeta.description,
   },
   authors: [{ name: "Elberd Sigauri" }],
+};
+
+/**
+ * The browser chrome should match the top of the page, and the topmost band on
+ * every route is the concept banner on brand-soft, not the white body.
+ */
+export const viewport: Viewport = {
+  themeColor: "#e7f0ff",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

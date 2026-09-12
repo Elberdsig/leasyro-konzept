@@ -7,7 +7,8 @@ export const metadata: Metadata = {
   title: "Datenschutz",
   description:
     "Diese Seite setzt keine Cookies, misst nichts und hat keine Formulare.",
-};
+  alternates: { canonical: "/datenschutz" },
+}
 
 /**
  * Privacy notice.
@@ -39,8 +40,10 @@ export default function DatenschutzPage() {
 
           <LegalBlock title="Verantwortlich">
             <p>{author.name}</p>
+            {/* Standalone, not inside a sentence: measured at 26px tall with
+                the inline variant, so it keeps the full 44px target. */}
             <p>
-              <TextLink href={author.emailHref} inline>{author.email}</TextLink>
+              <TextLink href={author.emailHref}>{author.email}</TextLink>
             </p>
             <p>{author.addressNote}</p>
           </LegalBlock>

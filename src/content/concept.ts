@@ -29,12 +29,12 @@ export const comparison: ComparisonRow[] = [
   {
     metric: "Übertragung beim ersten Aufruf, Desktop ohne Cache",
     before: "2.513.200 Byte",
-    after: "240.645 Byte",
+    after: "248.653 Byte",
   },
   {
     metric: "Davon JavaScript",
     before: "1.425.298 Byte",
-    after: "142.599 Byte, nur die Next- und React-Laufzeit",
+    after: "144.633 Byte, davon 4.350 Byte eigener Code für den Rechner, der Rest Next- und React-Laufzeit",
   },
   {
     metric: "Größter JavaScript-Block",
@@ -74,12 +74,12 @@ export const comparison: ComparisonRow[] = [
   {
     metric: "Sehr kleine Schrift auf dem Handy",
     before: "53 Elemente mit 14 px, 4 mit 12 px",
-    after: "nichts unter 14 px, 21 Elemente mit 14 px",
+    after: "nichts unter 14 px, 28 Elemente mit 14 px",
   },
   {
     metric: "Seitenlänge der Startseite auf dem Handy",
     before: "8.398 px",
-    after: "6.570 px",
+    after: "7.990 px, davon 1.420 px der Rechner",
   },
   {
     metric: "Überschriftenstruktur",

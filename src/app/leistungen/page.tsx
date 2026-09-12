@@ -8,6 +8,7 @@ export const metadata: Metadata = {
   title: "Leistungen",
   description:
     "Softwareentwicklung, Wartung und Betrieb, Schulungen und Humafix. Konzept-Entwurf für leasyro.com.",
+  alternates: { canonical: "/leistungen" },
 };
 
 /**
@@ -54,7 +55,7 @@ export default function LeistungenPage() {
             key={service.id}
             id={service.id}
             tone={split ? "paper-2" : "paper"}
-            className="scroll-mt-28"
+            className="reveal scroll-mt-28"
           >
             <Container>
               <div
@@ -65,10 +66,10 @@ export default function LeistungenPage() {
                 }
               >
                 <div>
-                  <p className="eyebrow text-ink-faint">
-                    {String(index + 1).padStart(2, "0")}
-                  </p>
-                  <h2 className="mt-3 text-2xl leading-tight font-semibold sm:text-3xl">
+                  {/* No "01" .. "04" above these headings. The number carried
+                      no information: the jump navigation above already names
+                      all four, and the order is not a sequence to follow. */}
+                  <h2 className="text-2xl leading-tight font-semibold text-balance sm:text-3xl">
                     {service.title}
                   </h2>
                   <p className="mt-5 text-lg leading-relaxed text-ink-soft">
@@ -106,10 +107,12 @@ export default function LeistungenPage() {
         );
       })}
 
-      <section className="border-t border-line bg-brand-soft py-14">
+      <section className="reveal border-t border-line bg-brand-soft py-14">
         <Container className="flex flex-col items-start gap-6 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h2 className="text-2xl font-semibold">Passt eine davon zu dir?</h2>
+            <h2 className="text-2xl font-semibold text-balance">
+              Passt eine davon zu dir?
+            </h2>
             <p className="mt-2 text-ink-soft">
               Im ersten Gespräch klären wir, was du wirklich brauchst.
             </p>

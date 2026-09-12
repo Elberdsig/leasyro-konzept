@@ -8,7 +8,8 @@ export const metadata: Metadata = {
   title: "Impressum",
   description:
     "Impressum des Konzept-Entwurfs. Betreiber ist Elberd Sigauri, nicht die leasyro GmbH.",
-};
+  alternates: { canonical: "/impressum" },
+}
 
 /**
  * Imprint of the draft.
@@ -31,8 +32,10 @@ export default function ImpressumPage() {
 
           <LegalBlock title="Anbieter dieser Seite">
             <p>{author.name}</p>
+            {/* Standalone, not inside a sentence: measured at 26px tall with
+                the inline variant, so it keeps the full 44px target. */}
             <p>
-              <TextLink href={author.emailHref} inline>{author.email}</TextLink>
+              <TextLink href={author.emailHref}>{author.email}</TextLink>
             </p>
             <p>{author.addressNote}</p>
           </LegalBlock>

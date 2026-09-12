@@ -12,7 +12,7 @@ import { Button, Container, Eyebrow } from "@/components/ui";
  */
 export function ContactBand() {
   return (
-    <section className="border-t border-line bg-brand-soft py-14 sm:py-16">
+    <section className="reveal border-t border-line bg-brand-soft py-14 sm:py-16">
       <Container className="flex flex-col gap-10 lg:flex-row lg:items-center lg:justify-between">
         <div>
           <Eyebrow>Kontakt</Eyebrow>

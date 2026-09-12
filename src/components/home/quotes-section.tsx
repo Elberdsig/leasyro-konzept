@@ -9,7 +9,7 @@ import { Container, Section } from "@/components/ui";
  */
 export function QuotesSection() {
   return (
-    <Section tone="navy">
+    <Section tone="navy" className="reveal">
       <Container>
         <h2 className="text-lg font-semibold text-brand-soft">Das sagen Kunden</h2>
 

@@ -9,7 +9,8 @@
     "lint": "eslint",
     "check:contrast": "node scripts/check-contrast.mjs",
     "check:copy": "node scripts/check-copy.mjs",
-    "check": "npm run check:contrast && npm run check:copy"
+    "check": "npm run check:contrast && npm run check:copy",
+    "test": "vitest run"
   },
   "dependencies": {
     "@phosphor-icons/react": "^2.1.10",
@@ -25,6 +26,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.3.5",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^4.1.11"
   }
 }

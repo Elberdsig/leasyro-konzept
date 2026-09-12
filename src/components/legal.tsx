@@ -25,7 +25,7 @@ export function LegalBlock({
 }) {
   return (
     <section className="mt-10">
-      <h2 className="text-xl font-semibold sm:text-2xl">{title}</h2>
+      <h2 className="text-xl font-semibold text-balance sm:text-2xl">{title}</h2>
       <div className="mt-3 space-y-3 leading-relaxed text-ink-soft">
         {children}
       </div>

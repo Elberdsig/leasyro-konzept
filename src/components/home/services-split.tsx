@@ -10,7 +10,7 @@ import { Container, Section } from "@/components/ui";
  */
 export function ServicesSplit() {
   return (
-    <Section>
+    <Section className="reveal">
       <Container className="grid gap-10 lg:grid-cols-[5fr_7fr] lg:gap-16">
         <div className="lg:sticky lg:top-28 lg:self-start">
           <h2 className="text-3xl leading-tight font-semibold text-balance sm:text-4xl">

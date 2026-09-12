@@ -73,7 +73,9 @@ export function SiteHeader() {
       <div
         id={MENU_ID}
         popover="auto"
-        className="inset-0 m-0 h-full max-h-none w-full max-w-none border-0 bg-paper p-0 text-ink"
+        /* Full bleed, so the notch of a phone must not swallow the close
+           button or the last menu entry. */
+        className="inset-0 m-0 h-full max-h-none w-full max-w-none border-0 bg-paper p-0 pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] text-ink"
       >
         <div className="flex h-[60px] items-center justify-between border-b border-line px-5">
           <span className="eyebrow text-ink-faint">Menü</span>

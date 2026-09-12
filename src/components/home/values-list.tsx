@@ -11,7 +11,7 @@ import { Container, Section } from "@/components/ui";
  */
 export function ValuesList() {
   return (
-    <Section tone="paper-2">
+    <Section tone="paper-2" className="reveal">
       <Container>
         <h2 className="max-w-2xl text-3xl leading-tight font-semibold text-balance sm:text-4xl">
           {valuesIntro.title}

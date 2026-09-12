@@ -253,3 +253,323 @@ Schließen-Knopf funktioniert. Kein eigenes JavaScript beteiligt.
 7. **`NEXT_PUBLIC_SITE_URL` ist noch nicht gesetzt.** Bis dahin stehen in Sitemap und
    `metadataBase` localhost-Adressen. Das muss vor dem Deploy im Vercel-Projekt eingetragen
    werden.
+---
+
+## Zweiter Durchgang, 12.09.2026 (Agent B): Tests und CI
+
+### Tests (Vitest, `npm test`)
+
+`vitest` ohne DOM, ohne jsdom, ohne Testing-Library. Die Seiten tragen keine Logik, die sich zu
+mounten lohnt, deshalb prüfen die Tests Inhalte, Verweise und Rechnung. Fünf Dateien, 27 Tests,
+Laufzeit unter einer Sekunde. Konfiguration in `vitest.config.ts`: `tests/**/*.test.ts` plus
+Alias `@` auf `./src`, damit die Content-Module wie im Projekt importiert werden.
+
+| Datei | Was sie abdeckt |
+|---|---|
+| `tests/content-facts.test.ts` | liest `src/content/` von der Platte, importiert jedes Modul und läuft durch jeden String: jede Datei mit Tatsachen über leasyro nennt im Kommentar eine Quelle mit `https://` und dem Datum 12.09.2026, kein sichtbarer Text enthält einen Gedankenstrich, keiner einen offenen Platzhalter `[[` |
+| `tests/links.test.ts` | leitet die Routen aus den `page.tsx` unter `src/app/` ab und prüft, dass jeder interne Link in `site.ts` auf eine vorhandene Route zeigt, dass Navigation und Fußzeile vollständig sind und dass jeder externe Link mit `https://` beginnt |
+| `tests/jobs.test.ts` | `datePosted` ist ein gültiges ISO-Datum und identisch zum Rücktausch über `Date`, `dateModified` liegt nicht davor, Titel, Ort und Beschreibung sind nicht leer, Aufgaben, Qualifikation und Benefits sind gefüllt, und es gibt kein Gehaltsfeld und kein Eurozeichen, weil es dafür keine Quelle gibt |
+| `tests/contrast.test.ts` | rechnet mit derselben Funktion wie das Prüfskript: Weiß auf Schwarz ergibt 21, eine Farbe gegen sich selbst 1, das absichtlich schwache Paar `#b9c2ce` auf Weiß fällt unter 4,5, und alle 15 Token-Paare aus `globals.css` erfüllen ihre Schwelle (Farbwerte werden aus der Datei gelesen, nicht abgetippt) |
+| `tests/comparison.test.ts` | die Vorher-Nachher-Tabelle in `concept.ts` hat keine leere Zelle, keinen `[[MESSEN]]`-Marker, keine doppelte Kennzahl, und die Fußnote nennt die Messmethode mit Datum |
+
+Damit `tests/contrast.test.ts` dieselbe Rechnung benutzt wie die Prüfung, sind Formel, Paarliste
+und Gegenprobe aus `scripts/check-contrast.mjs` nach `scripts/lib/contrast.mjs` gewandert. Das
+Skript importiert sie jetzt. Gegenprobe dazu: die Ausgabe von `node scripts/check-contrast.mjs`
+wurde vor und nach dem Umbau gespeichert und ist Zeile für Zeile identisch (`diff` ohne Ausgabe).
+
+Gegenprobe zu den Inhaltstests: ein künstlicher Eintrag mit Gedankenstrich und `[[MESSEN]]` wurde
+in die geprüfte Liste geschoben. Zwei Tests schlugen fehl, danach wurde der Eintrag entfernt und
+alle 27 Tests waren wieder grün. Die Prüfung kann den Fehler also sehen.
+
+### CI (`.github/workflows/ci.yml`)
+
+Ausgelöst bei jedem Push auf `main` und bei jedem Pull Request. Zwei Jobs auf `ubuntu-latest`,
+Node 22 mit npm-Cache.
+
+1. **`pruefen`**: `npm ci`, `npm run lint`, `CHECK_STRICT=1 npm run check`, `npm test`,
+   `npm run build`. Der strenge Lauf ist Absicht: offene Platzhalter in `src/content/` sollen die
+   CI rot machen, nicht erst der Blick auf die veröffentlichte Seite.
+2. **`lighthouse`** (braucht `pruefen`): baut, startet `next start` auf Port 3000, wartet in einer
+   Schleife auf HTTP 200 und misst dann mit `treosh/lighthouse-ci-action@v12` vier Seiten: `/`,
+   `/leistungen`, `/karriere/software-developer`, `/konzept`. Schwellen in `.lighthouserc.json`:
+   Performance, Barrierefreiheit und Best Practices jeweils mindestens 0,95 als `error`. Ein Lauf
+   je Adresse, Handy-Profil (der Standard, also die härtere Messung), Berichte als Artefakt.
+
+**Was die CI nicht tut:** sie prüft den SEO-Wert nicht. Die Seite ist absichtlich für
+Suchmaschinen gesperrt, dadurch fällt `is-crawlable` durch und die Kategorie landet bei 66. Eine
+Schwelle darauf wäre eine Schwelle gegen die eigene Entscheidung. Die Begründung steht in der
+`README.md`, weil JSON keine Kommentare kennt. Ebenfalls nicht in der CI: Deploy (das macht
+Vercel selbst von `main`), Messung gegen die Live-Adresse (Lighthouse läuft gegen den lokal
+gestarteten Server), Sichtprüfung im Browser und ein Vergleich gegen leasyro.com.
+
+### Abweichungen und Notizen
+
+1. **`vitest@^4` statt der aktuellen 5.** Vitest 5 verlangt `@types/node` in `^22 || >=24`, das
+   Projekt steht auf `^20`. Vitest 4.1.11 akzeptiert `^20` und ist damit der kleinere Eingriff:
+   keine Typänderung in einem Projekt, an dem parallel gearbeitet wird.
+2. **Zwei Content-Dateien sind vom Quellen-Test ausgenommen.** `author.ts` (Elberds eigene
+   Kontaktdaten) und `concept-ideas.ts` (eigene Vorschläge, eigenes Arbeitsprotokoll) tragen keine
+   Tatsache über leasyro und deshalb keine fremde Quelle. Die Ausnahme steht mit Begründung im
+   Test, nicht versteckt. Alle anderen Dateien, auch die während dieses Durchgangs
+   hinzugekommene `calculator.ts`, bestehen die Prüfung.
+3. **Der Routen-Test verlangt die sieben Routen der Spezifikation, verbietet aber keine
+   achte.** Eine zusätzliche Seite soll die Tests nicht rot machen, ein Link ins Leere schon.
+4. **Die Zahlen in der README stammen aus `src/content/concept.ts`.** Dort steht Lighthouse
+   Performance 100 und Largest Contentful Paint 0,9 s, in `docs/KONZEPT.md` Abschnitt 11 steht
+   99 und 2,2 s. Beide Läufe sind vom 12.09.2026. Die README nennt die Werte der Content-Datei,
+   weil die Seite `/konzept` genau diese anzeigt. Wer die Differenz auflöst, sollte beide Stellen
+   angleichen.
+5. **Kein Bild in der README.** `docs/screens/nachher-2-desktop.png` gab es beim Schreiben nicht.
+6. **Eine Warnung bleibt stehen.** `vitest run` meldet, dass `vitest.config.ts` ESM-Syntax
+   enthält, aber als CommonJS geladen wird (das Projekt hat kein `"type": "module"`). Die Tests
+   laufen trotzdem. Ein `.mjs`-Config oder `"type": "module"` würde das Projekt weiter verändern,
+   als dieser Durchgang darf.
+7. **`.gitignore`** kennt jetzt `/.vitest`, `/.lighthouseci` und `/lhci-report`.
+
+### Selbst geprüft
+
+```
+npm test                      5 Dateien, 27 Tests, alle gruen
+npm run lint                  ohne Ausgabe, also fehlerfrei
+CHECK_STRICT=1 npm run check  15 Kontrastpaare gruen, Gegenprobe bestanden, keine Platzhalter
+```
+
+Die Workflow-Datei wurde mit `js-yaml` geladen und auf ihre Struktur geprüft (zwei Jobs
+`pruefen` und `lighthouse`, Auslöser `push` und `pull_request`, `needs: pruefen`,
+`treosh/lighthouse-ci-action@v12`); PyYAML ist auf diesem Rechner nicht installiert.
+`.lighthouserc.json` wurde mit `json.load` geladen. Beides sagt nur, dass die Dateien gültig und
+richtig gebaut sind. Ob die CI durchläuft, zeigt erst der erste Push: das ist der offene Punkt
+dieses Durchgangs.
+
+
+---
+
+## Zweiter Durchgang, 12.09.2026 (Agent A)
+
+Aufgabe: eine eigene Idee einbauen, Bewegung sparsam nachrüsten, die Konzept-Seite erweitern,
+den Bestand feinschleifen und alles gegen `docs/web-interface-guidelines.md` prüfen. Alle Zahlen
+unten sind selbst gemessen, gegen `npx next start -p 3013` auf dem fertigen Produktions-Build mit
+`.env.production`.
+
+### 1. Der Handarbeits-Rechner (die eigene Idee)
+
+`src/components/home/effort-calculator.tsx`, Inhalt in `src/content/calculator.ts`, montiert auf
+der Startseite zwischen `ServicesSplit` und `ValuesList`. Eigene Layout-Familie: Formular links,
+Ergebnis rechts, auf dem Handy untereinander.
+
+Der Grund steht im Kopfkommentar der Inhaltsdatei: benboehm.com trägt als Überschrift
+„Manuelle Prozesse kosten dich täglich Geld." (selbst abgerufen am 12.09.2026), leasyro.com
+verkauft dieselbe Sache, nennt aber nirgends eine Zahl. Der Rechner liefert genau eine Zahl, die
+der Besucher selbst erzeugt: Mitarbeitende mal Stunden mal 46 Arbeitswochen, dazu der
+Stundensatz. **Keine Ersparnis, kein Prozentwert, kein Versprechen**, nur der Satz „Das ist der
+Betrag, um den es geht. Im Gespräch klären wir, welcher Teil davon in Software gehört."
+
+Drei Entscheidungen, die im Code begründet sind:
+
+1. **Kein Import aus `@/components/ui`.** Alles in dieser Datei liegt in einem Modul mit
+   `next/link` und einem Phosphor-Icon; ein Import von dort hätte beides in das Client-Bündel
+   gezogen. Der Termin-Button wird deshalb in `src/app/page.tsx` (Server) gebaut und als Prop
+   `cta` übergeben. Kosten des einzigen Client-Bausteins gemessen: **plus 4.350 Byte JavaScript**
+   (146.949 statt 142.599).
+2. **Zahlen mit `Intl.NumberFormat("de-DE")`**, auf Server und Client derselbe Aufruf. Das
+   Eurozeichen wird von Hand mit geschütztem Leerzeichen angehängt, weil die `currency`-Variante
+   ihr Trennzeichen zwischen ICU-Versionen geändert hat und genau das ein Hydrations-Fehler wäre.
+   Gemessen: keine einzige Konsolenmeldung auf sieben Routen und zwei Breiten.
+3. **`useState` startet mit den Werten aus der Inhaltsdatei**, der Server rendert also ein
+   fertiges Ergebnis. Mit abgeschaltetem JavaScript stehen 1.656 Stunden und 57.960 € da
+   (nachgemessen in einem Kontext mit `java_script_enabled=False`).
+
+Bedienung im echten Browser durchgeprüft: Tastatur (fünfmal Pfeil rechts auf dem ersten Schieber,
+12 wird 17, Ergebnis 2.346 Stunden / 82.110 €), Tippen in die Zahlenfelder (50 / 2,5 / 60 ergibt
+5.750 Stunden / 345.000 €), Mausklick in die Mitte der Stundensatz-Spur (35 wird 60), Eingabe
+von 500 bei Mitarbeitenden wird auf 200 begrenzt. Schieber-Daumen 26 px, Element 44 px hoch,
+Zahlenfeld 96 mal 48 px, Fokusring 2 px brand-ink (gemessen, siehe Audit-Notiz unten).
+
+### 2. Bewegung
+
+`.reveal` in `globals.css`: CSS-Scroll-Animation über `animation-timeline: view()`,
+`animation-range: entry 0% entry 40%`, opacity 0 auf 1 und 16 px Hub. Zwei Tore:
+`@supports (animation-timeline: view())` und `@media (prefers-reduced-motion: no-preference)`.
+Angewendet auf alle Sektionen nach dem ersten Block jeder Seite, nie auf Hero, H1 oder Kopf.
+Zweite und letzte Bewegung: Bento-Kacheln heben sich beim Zeigen 2 px mit dem neuen Token
+`--shadow-lift`, 150 ms, der Hub steckt hinter `motion-safe`.
+
+**Dabei einen echten Fehler gefunden und behoben.** Mit `animation-fill-mode: both` füllt die
+Animation auch rückwärts: solange die Zeitachse nicht gelaufen ist, steht das Element auf
+opacity 0. Auf einer Seite, die man scrollt, fällt das nicht auf. Überall sonst schon. Gemessen
+bei einem Fenster von 1440 mal 5400 px, also ohne Scrollweg: **sechs von sieben Sektionen waren
+unsichtbar**, der ganze erste Vollbild-Screenshot war unter dem Hero leer. Mit `forwards` stehen
+alle sieben auf opacity 1. Zusätzlich schaltet `@media print` die Animation ganz ab, denn Papier
+scrollt nicht. Beides steht als Begründung im Kommentar über der Regel.
+
+Gegenprobe zur Bewegung selbst: mit `prefers-reduced-motion: reduce` haben alle `.reveal`
+von Anfang an opacity 1. Beim Durchlaufen mit sofortigem Scrollen erreicht jede Sektion
+opacity 1 und `translateY(0)`.
+
+Und eine Messfalle, die fast zu einem falschen Bericht geführt hätte: der erste Durchlauf zeigte
+die letzten Sektionen auch nach dem Scrollen auf opacity 0. Ursache war nicht die Animation,
+sondern `scroll-behavior: smooth` in der Basis: `window.scrollTo` in einer Schleife wird von der
+weichen Animation überholt, die Seite stand in Wahrheit bei 60 Prozent. Zweite Messung mit
+`behavior: "instant"` war grün.
+
+### 3. Konzept-Seite
+
+Drei neue Sektionen aus `src/content/concept-ideas.ts`, zwischen „Was ich bewusst weggelassen
+habe" und „Stack und Arbeitsweise", jede in einer eigenen Layout-Familie und jede nur dann im
+HTML, wenn ihr Array Einträge hat:
+
+- **Ideen** als Liste mit Trennlinien: Titel links, „Aufwand: ..." rechts, darunter „Warum" und
+  „Wie" zweispaltig.
+- **Zeitleiste** als `<ol>` mit Uhrzeit links, dünner Linie mit Punkt und Satz rechts.
+- **Qualitäts-Prüfungen** als zweispaltige `dl` ohne Kachel und ohne Randlinie.
+
+Die Bedingung `array.length > 0` ist kein Schmuck: die Arrays waren beim Bau der Seite leer und
+wurden parallel von einem Text-Agenten gefüllt. Der Build war zu keinem Zeitpunkt kaputt.
+
+### 4. Feinschliff im Bestand
+
+- Die Ziffern „01" bis „04" über den vier Abschnitten auf `/leistungen` sind weg. Die
+  Sprungnavigation nennt alle vier bereits, die Reihenfolge ist keine Abfolge.
+- `alternates: { canonical: "<pfad>" }` in der Metadata jeder der sieben Seiten. Im HTML geprüft:
+  jede Route trägt `<link rel="canonical">` auf `https://leasyro-konzept.vercel.app/<pfad>`.
+- `next.config.ts` sendet auf jeder Route vier Header, mit `curl -I` auf allen sieben geprüft:
+  `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`,
+  `Permissions-Policy: camera=(), microphone=(), geolocation=()`, `X-Frame-Options: DENY`.
+  Kein CSP, und der Grund steht als Kommentar in der Datei.
+- Alle Links haben ein Ziel: `grep -rn 'href="#"' src/` ist leer, das einzige `#` ist der
+  Sprunglink `#inhalt` und die vier Anker auf `/leistungen`.
+- Geprüft und unverändert gut: `<html lang="de">`, Sprunglink (1 mal 1 px versteckt, 196 mal
+  48 px mit Fokus, gemessen), Fokusringe.
+
+### 5. Audit gegen `docs/web-interface-guidelines.md`
+
+Gefunden und behoben:
+
+```text
+## src/app/impressum/page.tsx
+src/app/impressum/page.tsx:35 - E-Mail-Link allein im Absatz, aber Variante `inline`: 171x26 px statt 44
+
+## src/app/datenschutz/page.tsx
+src/app/datenschutz/page.tsx:43 - dito
+
+## src/app/globals.css
+globals.css - kein `color-scheme`: die neuen Zahlenfelder erben im dunklen System die dunkle Palette
+globals.css - kein `touch-action: manipulation`, kein `-webkit-tap-highlight-color`
+globals.css - `[popover]` ohne `overscroll-behavior: contain`
+globals.css - `.reveal` mit `fill-mode: both` haelt Inhalt auf opacity 0, wenn nicht gescrollt wird
+
+## src/components/site-header.tsx
+site-header.tsx:76 - Vollflaechen-Popover ohne `env(safe-area-inset-*)`
+
+## src/app/layout.tsx
+layout.tsx - kein `<meta name="theme-color">`
+
+## src/app/konzept/page.tsx
+konzept/page.tsx - Zahlenspalten der Vergleichstabelle ohne `tabular-nums`
+konzept/page.tsx - Stack-Liste ohne `translate="no"` (Produktnamen)
+konzept/page.tsx - sechs Ueberschriften ohne `text-wrap: balance`
+
+## src/components/home/worlds-bento.tsx
+worlds-bento.tsx:65 - Flex-Kind ohne `min-w-0`, Markenname ohne `break-words`/`translate="no"`
+
+## src/app/karriere/page.tsx
+karriere/page.tsx:88 - Flex-Kind ohne `min-w-0`; zwei Ueberschriften ohne `text-balance`
+
+## src/app/karriere/software-developer/page.tsx
+software-developer/page.tsx - vier Ueberschriften ohne `text-balance`
+
+## src/app/leistungen/page.tsx
+leistungen/page.tsx - Ziffern-Eyebrow als Deko; eine Ueberschrift ohne `text-balance`
+
+## src/components/legal.tsx
+legal.tsx:28 - Ueberschrift ohne `text-balance`
+
+## next.config.ts
+next.config.ts - keine Sicherheits-Header
+```
+
+Geprüft, kein Befund: Icon-Buttons haben `aria-label` (Menü auf und zu) · jedes dekorative Icon
+`aria-hidden` · jedes Bild über `next/image` mit Maßen und `alt`, unter dem Falz lazy, Logo
+`priority` · kein `transition: all`, kein `outline-none`, kein `user-scalable=no` (Viewport ist
+`width=device-width, initial-scale=1`) · kein `...` im Text, deutsche typografische
+Anführungszeichen im Zitatblock · genau eine `h1` je Seite, keine übersprungene Ebene ·
+keine Klick-Handler auf `div` oder `span` · `scroll-padding-top: 7rem` hält den klebenden Kopf
+von einem fokussierten Element fern · Formularfelder mit `<label>`, `name`, `autocomplete="off"`,
+passendem `inputmode` und `onChange` · Ergebnis in `aria-live="polite"` · keine Konsolenmeldung
+auf sieben Routen und zwei Breiten.
+
+Bewusste Abweichungen: der Zustand des Rechners steht **nicht** in der URL (dafür bräuchte es
+einen Router-Push je Tastendruck oder ein serverseitiges Lesen von `searchParams`, das die Route
+dynamisch macht; drei Schieberstellungen sind keinen Link wert) · „Title Case" für Überschriften
+ist eine englische Regel und bleibt weg · externe Links öffnen weiter im selben Tab
+(Abschnitt 4.5) · kein CSP.
+
+Eine Messung, die falschen Alarm gab: der Fokusring des Zahlenfelds meldete direkt nach
+`.focus()` die Farbe `rgb(18, 23, 42)`. Ursache ist `transition-colors`, das laut Tailwind auch
+`outline-color` überblendet; 400 ms später steht der Ring korrekt auf `rgb(10, 88, 202)`. Kein
+Fehler, aber ein guter Grund, jede Fokusmessung mit Wartezeit zu machen.
+
+### 6. Messwerte dieses Durchgangs
+
+| Prüfung | Ergebnis |
+|---|---|
+| `npx eslint src next.config.ts` | ohne Ausgabe |
+| `npm run build` | `✓ Compiled successfully`, 13 Routen, 0 Warnungen |
+| `npm run check` | 15 Kontrastpaare grün, Gegenprobe bestanden, keine Gedankenstriche |
+| `grep -rn '"use client"' src/` | genau 1 Treffer |
+| sieben Routen mit curl | alle 200, `/gibtsnicht` 404 |
+| vier Sicherheits-Header | auf allen sieben Routen vorhanden |
+| `<link rel="canonical">` | auf allen sieben korrekt und absolut |
+| Gedankenstrich im gerenderten HTML | auf acht Routen keiner |
+| Klickziele unter 44 px | 0 freistehende (Sprunglink versteckt 1 px, mit Fokus 48 px) |
+| Text unter 14 px | 0 auf sieben Routen, 390 und 1440 px |
+| horizontaler Überlauf | keiner, 390 und 1440 px, sieben Routen |
+| Konsole (Fehler und Warnungen) | leer, auch keine Hydrations-Warnung |
+| Übertragung Startseite, erster Aufruf | 241.349 Byte Desktop, 237.907 Byte Handy |
+| davon JavaScript | 146.949 Byte (vorher 142.599, also plus 4.350 für den Rechner) |
+| Schriftdateien | 2 |
+| Startseite Handy, Höhe | 7.990 px (vorher 6.570; der Rechner ist 1.420 px davon) |
+| Bilder ohne `alt` oder Maße | 0 |
+
+Screenshots dieses Durchgangs: `docs/screens/nachher-2-start-desktop.png`,
+`nachher-2-start-handy.png`, `nachher-2-konzept-desktop.png`, `nachher-2-konzept-handy.png`
+(Playwright mit System-Chrome, 1440 und 390 px, jeweils die ganze Seite).
+
+### 7. Was offen ist
+
+1. **Die Startseite ist auf dem Handy um 1.420 px gewachsen** (7.990 statt 6.570 px), genau um
+   den Rechner. Die Live-Seite liegt bei 8.398 px, der Vorsprung ist also klein geworden. Die
+   Zahl auf `/konzept` und in `docs/KONZEPT.md` Abschnitt 8 gehört korrigiert, oder der Rechner
+   wandert auf eine Unterseite. Entscheidung für die Hauptsitzung: ich halte ihn auf der
+   Startseite für richtig, weil er der einzige Grund ist, warum ein Geschäftsführer dort stehen
+   bleibt.
+2. **`npm run lint` schlägt fehl, aber nicht in meinen Dateien**:
+   `tests/content-facts.test.ts:23` verstößt gegen `@next/next/no-assign-module-variable`. Die
+   Datei gehört zum parallelen Durchgang (Tests und CI) und wurde nicht angefasst.
+   `npx eslint src next.config.ts` ist sauber.
+3. **Kein Lighthouse in diesem Durchgang.** Die Einzelwerte sind gemessen, der zusammengesetzte
+   Wert kommt aus der CI des anderen Durchgangs.
+4. **Die Schieber-Spur hat keine gefüllte Seite** (kein farbiger Teil links vom Daumen). Dafür
+   müsste JavaScript eine CSS-Variable setzen; die schlichte Spur reicht, und der Wert steht
+   ohnehin als Zahl daneben.
+5. **Der Rechner steht nicht im Vorher-Nachher-Vergleich auf `/konzept`.** Er ist keine
+   Verbesserung einer vorhandenen Zahl, sondern ein neuer Vorschlag, und er taucht in den
+   Ideen der Konzept-Seite auf.
+
+## Zweiter Durchgang, 12.09.2026 (Hauptsitzung): Abnahme
+
+Selbst geprüft nach der Arbeit der beiden Agenten: `npm run lint`, `CHECK_STRICT=1 npm run check`,
+`npm test` (27 grün), `npm run build` (13 Routen, 0 Warnungen), Playwright-Messung mit demselben
+Skript wie am Mittag, Lighthouse lokal gegen den Produktions-Build.
+
+**Ein Fehler, den erst Lighthouse gezeigt hat:** die Einblend-Animation (`.reveal`) fuhr die
+Deckkraft von 0 auf 1. Lighthouse trifft die Elemente mitten in der Zeitachse, rechnet den Text
+als `#a0a2aa` auf Weiß (2,46 : 1) und lässt vier Kontrast-Audits durchfallen, Barrierefreiheit
+97 statt 100. Das ist keine Messfalle, ein Nutzer mit hohem Fenster sieht denselben blassen Text.
+Behoben: die Bewegung ist jetzt nur noch der 16-px-Hub, ohne Deckkraft. Danach 100.
+
+Werte nach dem zweiten Durchgang (lokal, Handy-Profil): Startseite Performance 98, Barrierefreiheit
+100, Best Practices 100, SEO 69 (noindex). Übertragung Desktop 248.653 Byte, JavaScript 144.633
+Byte (davon 4.350 für den Rechner), 2 Schriftdateien, 0 Klickziele unter 44 px, Startseite auf
+dem Handy 7.990 px (der Rechner ist 1.420 px davon; die Live-Seite hat 8.398 px ohne einen
+solchen Baustein). Konsole ohne Meldung, keine Hydrations-Warnung.

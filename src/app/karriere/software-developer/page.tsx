@@ -9,6 +9,7 @@ export const metadata: Metadata = {
   title: developerJob.title,
   description:
     "Softwareentwicklung mit TypeScript, Next.js und React Native bei leasyro in Berlin. Konzept-Entwurf der Stellenseite.",
+  alternates: { canonical: "/karriere/software-developer" },
 };
 
 /**
@@ -90,11 +91,11 @@ export default function SoftwareDeveloperPage() {
         </Container>
       </Section>
 
-      <Section>
+      <Section className="reveal">
         <Container>
           <div className="grid gap-12 lg:grid-cols-2 lg:gap-16">
             <div>
-              <h2 className="text-2xl font-semibold sm:text-3xl">
+              <h2 className="text-2xl font-semibold text-balance sm:text-3xl">
                 Deine Aufgaben
               </h2>
               <ul className="mt-6 space-y-3">
@@ -104,7 +105,7 @@ export default function SoftwareDeveloperPage() {
               </ul>
             </div>
             <div>
-              <h2 className="text-2xl font-semibold sm:text-3xl">
+              <h2 className="text-2xl font-semibold text-balance sm:text-3xl">
                 Das bringst du mit
               </h2>
               <ul className="mt-6 space-y-3">
@@ -117,9 +118,9 @@ export default function SoftwareDeveloperPage() {
         </Container>
       </Section>
 
-      <Section tone="paper-2">
+      <Section tone="paper-2" className="reveal">
         <Container>
-          <h2 className="text-2xl font-semibold sm:text-3xl">
+          <h2 className="text-2xl font-semibold text-balance sm:text-3xl">
             Das bekommst du
           </h2>
           <div className="mt-8 grid gap-x-12 gap-y-9 sm:grid-cols-2 lg:grid-cols-3">
@@ -137,10 +138,10 @@ export default function SoftwareDeveloperPage() {
         </Container>
       </Section>
 
-      <Section>
+      <Section className="reveal">
         <Container>
           <div className="max-w-3xl">
-            <h2 className="text-2xl font-semibold sm:text-3xl">
+            <h2 className="text-2xl font-semibold text-balance sm:text-3xl">
               {developerJob.application.title}
             </h2>
             <p className="mt-4 text-lg text-ink-soft">

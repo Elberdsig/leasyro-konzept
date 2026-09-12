@@ -268,8 +268,8 @@ Antworten des ersten Aufrufs inklusive Dokument; Lighthouse 13, Handy-Profil, lo
 | Klickziele unter 44 px | 50 (Desktop) / 40 (Handy) | 0 (satzinterne Links ausgenommen) |
 | Text unter 14 px | 8 Elemente | 0 |
 | Startseite Handy | 8.398 px | 6.570 px |
-| Lighthouse Performance / A11y / Best Practices / SEO | 71 / 89 / 96 / 100 | 99 / 100 / 100 / 66 (noindex) |
-| LCP mobil | 11,2 s | 2,2 s |
+| Lighthouse Performance / A11y / Best Practices / SEO | 71 / 89 / 96 / 100 | 100 / 100 / 100 / 66 (noindex), gegen die Live-Adresse gemessen; lokal gedrosselt 99 mit LCP 2,2 s |
+| LCP mobil | 11,2 s | 0,9 s |
 
 Die Erstmessung in Abschnitt 2 zählte nur Ressourcen ohne das Dokument (2.458.521 Byte); die
 Tabelle auf `/konzept` verwendet die Zahlen dieser zweiten, methodengleichen Messung.

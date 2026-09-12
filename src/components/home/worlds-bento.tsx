@@ -15,7 +15,7 @@ export function WorldsBento() {
   const [benboehm, humafix, lena] = worlds;
 
   return (
-    <Section tone="paper-2">
+    <Section tone="paper-2" className="reveal">
       <Container>
         <SectionHead
           title="Ein Unternehmen, drei Arten von Arbeit"
@@ -38,8 +38,12 @@ type CardProps = {
 };
 
 function WorldCard({ world, size, className = "" }: CardProps) {
+  // Hover feedback, the second and last kind of movement on this site: the
+  // cell lifts 2px and picks up the one shadow token, over 150 ms. The lift is
+  // behind motion-safe, the shadow is not, so a visitor who asked for reduced
+  // motion still gets an answer to the pointer, just without the travel.
   const frame =
-    "relative flex overflow-hidden rounded-card border border-line bg-paper";
+    "relative flex overflow-hidden rounded-card border border-line bg-paper transition-[transform,box-shadow] duration-150 hover:shadow-lift motion-safe:hover:-translate-y-[2px]";
 
   // The accent rule is the only place the area colours appear. They are never
   // used for text, so they never need to clear a contrast threshold.
@@ -62,9 +66,9 @@ function WorldCard({ world, size, className = "" }: CardProps) {
           height={48}
           className="h-12 w-12 shrink-0"
         />
-        <div className="flex-1">
-          <h3 className="text-lg font-semibold">
-            {world.name}
+        <div className="min-w-0 flex-1">
+          <h3 className="text-lg font-semibold break-words">
+            <span translate="no">{world.name}</span>
             <span className="font-normal text-ink-faint"> · {world.claim}</span>
           </h3>
           <p className="mt-1 text-ink-soft">{world.vision}</p>
@@ -88,7 +92,10 @@ function WorldCard({ world, size, className = "" }: CardProps) {
         height={large ? 64 : 52}
         className={large ? "h-16 w-16" : "h-13 w-13"}
       />
-      <h3 className={`mt-5 font-semibold ${large ? "text-2xl sm:text-3xl" : "text-xl"}`}>
+      <h3
+        translate="no"
+        className={`mt-5 font-semibold ${large ? "text-2xl sm:text-3xl" : "text-xl"}`}
+      >
         {world.name}
       </h3>
       <p className={`mt-2 font-semibold text-brand-ink ${large ? "text-lg" : "text-base"}`}>

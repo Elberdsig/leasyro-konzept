@@ -7,7 +7,7 @@ import { Container, Section, TextLink } from "@/components/ui";
  */
 export function Story() {
   return (
-    <Section>
+    <Section className="reveal">
       <Container>
         <div className="max-w-3xl">
           <h2 className="text-3xl leading-tight font-semibold text-balance sm:text-4xl">

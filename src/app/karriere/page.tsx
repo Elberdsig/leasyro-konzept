@@ -9,6 +9,7 @@ export const metadata: Metadata = {
   title: "Karriere",
   description:
     "Drei offene Stellen bei leasyro. Konzept-Entwurf, Bewerbungen laufen über leasyro.com.",
+  alternates: { canonical: "/karriere" },
 };
 
 /**
@@ -33,7 +34,7 @@ export default function KarrierePage() {
         </Container>
       </Section>
 
-      <Section>
+      <Section className="reveal">
         <Container>
           <ul className="border-t border-line">
             {jobs.map((job) => (
@@ -65,10 +66,12 @@ export default function KarrierePage() {
         </Container>
       </Section>
 
-      <section className="border-t border-line bg-brand-soft py-14">
+      <section className="reveal border-t border-line bg-brand-soft py-14">
         <Container className="flex flex-col items-start gap-6 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h2 className="text-2xl font-semibold">Nichts Passendes dabei?</h2>
+            <h2 className="text-2xl font-semibold text-balance">
+              Nichts Passendes dabei?
+            </h2>
             <p className="mt-2 max-w-xl text-ink-soft">
               Initiativbewerbungen gehen den gleichen Weg wie alle anderen: über
               die offizielle Karriereseite.
@@ -85,11 +88,11 @@ export default function KarrierePage() {
 
 function JobText({ job }: { job: (typeof jobs)[number] }) {
   return (
-    <div className="flex-1">
+    <div className="min-w-0 flex-1">
       <p className="eyebrow text-ink-faint">
         {job.area} · {job.employment}
       </p>
-      <h2 className="mt-3 text-xl font-semibold transition-colors group-hover:text-brand-ink sm:text-2xl">
+      <h2 className="mt-3 text-xl font-semibold text-balance transition-colors group-hover:text-brand-ink sm:text-2xl">
         {job.title}
       </h2>
       <p className="mt-2 max-w-2xl leading-relaxed text-ink-soft">

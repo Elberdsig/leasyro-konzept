@@ -56,6 +56,11 @@
   --radius-card: 12px;
   --radius-btn: 6px;
   --radius-pill: 999px;
+
+  /* The only shadow on the site. It shows up when the pointer is on a bento
+     cell and nowhere else, so a raised card always means the same thing.
+     Tinted with the ink colour instead of pure black. */
+  --shadow-lift: 0 6px 18px -6px rgba(18, 23, 42, 0.22);
 }
 
 @layer base {
@@ -63,6 +68,10 @@
     scroll-behavior: smooth;
     /* Anchor targets on /leistungen must clear the sticky header. */
     scroll-padding-top: 7rem;
+    /* One light theme, declared. Without this the number fields of the
+       calculator would render in the dark palette of the operating system
+       while the page around them stays white. */
+    color-scheme: light;
   }
 
   body {
@@ -70,6 +79,16 @@
     color: var(--color-ink);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
+  }
+
+  /* No 300 ms wait for a double tap on anything you can operate, and a tap
+     highlight in the brand colour instead of the default grey box. */
+  a,
+  button,
+  label,
+  input {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: rgba(13, 110, 253, 0.18);
   }
 
   ::selection {
@@ -113,6 +132,133 @@
 /* The mobile menu is a native popover, so it needs a plain backdrop. */
 [popover]::backdrop {
   background: rgba(18, 23, 42, 0.45);
+}
+
+/* A scroll inside the open menu must not scroll the page behind it. */
+[popover] {
+  overscroll-behavior: contain;
+}
+
+/*
+  Movement on this site does exactly two things.
+
+  One: it builds hierarchy while you scroll. A section that is still below the
+  fold arrives with a short fade and a 16px lift, so the eye knows where the
+  next block starts. Two: it answers the pointer on hover.
+
+  Nothing else moves. No parallax, no counting numbers, no sliding headlines.
+
+  This is CSS scroll driven animation, tied to the scroll position through
+  `view()`, not to a clock. That matters: a time based fade can be left
+  unfinished in a background tab or a restored session, and would hide the
+  content for good. Here the progress is the scroll offset itself.
+
+  Two gates guard it. `@supports` keeps every browser without
+  `animation-timeline` at full opacity, and `prefers-reduced-motion:
+  no-preference` means a visitor who asked for less motion sees the plain page.
+  In both cases the content is simply visible, never hidden.
+
+  The fill mode is `forwards`, not `both`, and that was measured rather than
+  guessed. With `both` the animation also fills backwards, so an element sits
+  at opacity 0 while the timeline has not started. That is fine on a page you
+  scroll, and wrong everywhere else: in a window taller than the page, in a
+  full page screenshot and on paper there is no scrolling at all, and the whole
+  page below the hero stayed blank. Measured 12.09.2026 at a viewport of
+  1440 x 5400: with `both` six of seven sections were invisible, with
+  `forwards` all seven are at opacity 1. Print is switched off separately,
+  further down.
+
+  Never applied to the hero, the h1 or the header. The most important element
+  of the page hangs on no animation at all.
+*/
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .reveal {
+      animation: reveal-in linear forwards;
+      animation-timeline: view();
+      animation-range: entry 0% entry 40%;
+    }
+  }
+}
+
+/* Paper does not scroll. Nothing on it may depend on a scroll position. */
+@media print {
+  .reveal {
+    animation: none;
+    transform: none;
+  }
+}
+
+/*
+  Movement only, no opacity. Measured 12.09.2026 with Lighthouse against the
+  production build: while an element sits in the first part of its view()
+  timeline its computed opacity is below 1, and every contrast audit on it
+  fails (ink at 0.6 reads as #a0a2aa on white, 2.46:1). A user with a tall
+  window or a screen reader with a visual companion would see the same faint
+  text. A 16px rise says "this arrived" just as clearly and never touches
+  legibility.
+*/
+@keyframes reveal-in {
+  from {
+    transform: translateY(16px);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+/*
+  Range input of the calculator.
+
+  The native thumb is around 12px wide on most platforms, which is a poor
+  target on a phone. Both engines need their own pseudo element, so the same
+  26px thumb is declared twice. The element itself keeps a 44px tall hit area
+  even though the visible track is 6px.
+
+  The focus ring is the global :focus-visible outline on the input, which
+  frames the whole control. That is deliberate: an outline on the thumb alone
+  is easy to lose on a long track.
+*/
+.slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  min-height: 44px;
+  background: transparent;
+  cursor: pointer;
+}
+
+.slider::-webkit-slider-runnable-track {
+  height: 6px;
+  border-radius: var(--radius-pill);
+  background: var(--color-line);
+}
+
+.slider::-moz-range-track {
+  height: 6px;
+  border-radius: var(--radius-pill);
+  background: var(--color-line);
+}
+
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 26px;
+  width: 26px;
+  margin-top: -10px;
+  border: 3px solid var(--color-paper);
+  border-radius: var(--radius-pill);
+  background: var(--color-brand-ink);
+  box-shadow: 0 0 0 1px var(--color-brand-ink);
+}
+
+.slider::-moz-range-thumb {
+  height: 26px;
+  width: 26px;
+  border: 3px solid var(--color-paper);
+  border-radius: var(--radius-pill);
+  background: var(--color-brand-ink);
+  box-shadow: 0 0 0 1px var(--color-brand-ink);
 }
 
 @media (prefers-reduced-motion: reduce) {
