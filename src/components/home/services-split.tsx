@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { ArrowRight } from "@phosphor-icons/react/dist/ssr";
 import { services } from "@/content/services";
-import { Container, Eyebrow, Section } from "@/components/ui";
+import { Container, Section } from "@/components/ui";
 
 /**
  * Services as a two column split: the claim stands on the left and stays put,
@@ -13,8 +13,7 @@ export function ServicesSplit() {
     <Section>
       <Container className="grid gap-10 lg:grid-cols-[5fr_7fr] lg:gap-16">
         <div className="lg:sticky lg:top-28 lg:self-start">
-          <Eyebrow>Leistungen</Eyebrow>
-          <h2 className="mt-3 text-3xl leading-tight font-semibold text-balance sm:text-4xl">
+          <h2 className="text-3xl leading-tight font-semibold text-balance sm:text-4xl">
             Vier Wege, wie wir mit dir arbeiten
           </h2>
           <p className="mt-4 text-lg leading-relaxed text-ink-soft">

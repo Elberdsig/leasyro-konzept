@@ -4,12 +4,9 @@
  * The "before" column holds measurements taken on 12.09.2026 with
  * Python-Playwright and system Chrome against https://leasyro.com, desktop
  * 1440 px and phone 390 px. They are recorded in docs/KONZEPT.md section 2.
- * The "after" column stays [[MESSEN]] until this draft is built and measured
- * the same way. `npm run check` with CHECK_STRICT=1 refuses to pass while a
- * marker is still in the file, so nothing can go public half measured.
+ * The "after" column was filled on 12.09.2026 from the same script run
+ * against the built draft (see docs/BAUBERICHT.md and docs/KONZEPT.md 8).
  */
-
-export const MEASURE_PENDING = "[[MESSEN]]";
 
 export const conceptIntro = {
   eyebrow: "Konzept",
@@ -31,78 +28,98 @@ export type ComparisonRow = {
 export const comparison: ComparisonRow[] = [
   {
     metric: "Übertragung beim ersten Aufruf, Desktop ohne Cache",
-    before: "2.458.521 Byte",
-    after: MEASURE_PENDING,
+    before: "2.513.200 Byte",
+    after: "240.645 Byte",
   },
   {
     metric: "Davon JavaScript",
     before: "1.425.298 Byte",
-    after: MEASURE_PENDING,
+    after: "142.599 Byte, nur die Next- und React-Laufzeit",
   },
   {
     metric: "Größter JavaScript-Block",
     before: "1.359.130 Byte",
-    after: MEASURE_PENDING,
+    after: "71.576 Byte",
   },
   {
     metric: "CSS",
     before: "245.665 Byte in 6 Dateien",
-    after: MEASURE_PENDING,
+    after: "5.607 Byte in 1 Datei",
   },
   {
     metric: "Vorgeladene Schriftdateien",
     before: "27 woff2, alle Poppins",
-    after: MEASURE_PENDING,
+    after: "2 woff2, Poppins 400 und 600",
   },
   {
     metric: "Strukturierte Daten (JSON-LD)",
     before: "keine, auch nicht bei der Stellenanzeige",
-    after: MEASURE_PENDING,
+    after: "Organization auf der Startseite, JobPosting auf der Stellenseite",
   },
   {
     metric: "Sprachangabe im HTML",
     before: "de_DE, ungültig",
-    after: MEASURE_PENDING,
+    after: "de",
   },
   {
     metric: "hreflang x-default",
     before: "zeigt auf /en",
-    after: MEASURE_PENDING,
+    after: "keins, die Seite ist einsprachig",
   },
   {
     metric: "Kleinste Klickziele auf dem Handy",
     before: "32 px, Minimum sind 44 px",
-    after: MEASURE_PENDING,
+    after: "44 px, Ausnahme sind 7 Links mitten im Satz",
   },
   {
     metric: "Sehr kleine Schrift auf dem Handy",
     before: "53 Elemente mit 14 px, 4 mit 12 px",
-    after: MEASURE_PENDING,
+    after: "nichts unter 14 px, 21 Elemente mit 14 px",
   },
   {
     metric: "Seitenlänge der Startseite auf dem Handy",
     before: "8.398 px",
-    after: MEASURE_PENDING,
+    after: "6.570 px",
   },
   {
     metric: "Überschriftenstruktur",
     before: "1 h1, 5 h2, 7 h3, in Ordnung",
-    after: MEASURE_PENDING,
+    after: "1 h1, 9 h2, 7 h3, in Ordnung",
   },
   {
     metric: "Bilder ohne Alternativtext",
     before: "0, in Ordnung",
-    after: MEASURE_PENDING,
+    after: "0, in Ordnung",
+  },
+  {
+    metric: "Lighthouse mobil, Performance",
+    before: "71, Largest Contentful Paint 11,2 s",
+    after: "99, Largest Contentful Paint 2,2 s",
+  },
+  {
+    metric: "Lighthouse mobil, Barrierefreiheit",
+    before: "89",
+    after: "100",
+  },
+  {
+    metric: "Lighthouse mobil, Best Practices",
+    before: "96",
+    after: "100",
+  },
+  {
+    metric: "Lighthouse mobil, SEO",
+    before: "100",
+    after: "66, einziger Abzug ist die absichtliche Sperre für Suchmaschinen",
   },
   {
     metric: "Cookie-Banner",
     before: "Alles akzeptieren als Primärbutton",
-    after: MEASURE_PENDING,
+    after: "keiner, weil nichts gesetzt wird",
   },
 ];
 
 export const comparisonNote =
-  "Gemessen am 12.09.2026 mit Playwright und System-Chrome, Desktop 1440 px und Handy 390 px. Die Nachher-Werte trage ich mit demselben Skript ein, sobald dieser Entwurf steht.";
+  "Beide Spalten habe ich am 12.09.2026 mit demselben Skript gemessen: Playwright mit System-Chrome, Desktop 1440 px und Handy 390 px, dazu Lighthouse 13 auf dem Handy-Profil. Die Übertragung zählt alle Antworten des ersten Aufrufs ohne Cache.";
 
 export type ChangeItem = {
   title: string;

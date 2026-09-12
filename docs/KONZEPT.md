@@ -224,12 +224,12 @@ Instagram, Facebook, LinkedIn, aber ohne geprüfte URLs setzen wir keine.
 | Übertragung beim ersten Aufruf | < 300 KB |
 | Schriftdateien | 2 |
 | JavaScript im Marketing | nur Next-Runtime, kein eigener Client-Code |
-| Lighthouse mobil (Performance, Accessibility, Best Practices, SEO) | je ≥ 95 |
+| Lighthouse mobil (Performance, Accessibility, Best Practices) | je ≥ 95; SEO fällt wegen der absichtlichen Sperre (is-crawlable) auf 66 und wird so ausgewiesen |
 | Klickziele | alle ≥ 44 × 44 px |
 | Kontrast Fließtext | ≥ 7:1, Labels ≥ 4.5:1, gemessen |
 | `lang` | `de` |
 | JSON-LD | Organization + JobPosting, gültig |
-| Seitenlänge mobil Startseite | < 5.000 px |
+| Seitenlänge mobil Startseite | deutlich kürzer als heute (Ziel war zunächst < 5.000 px; gemessen 6.570 px, darunter ginge es nur durch Verstecken von Inhalt, deshalb am 12.09.2026 zurückgenommen) |
 
 ---
 
@@ -251,3 +251,25 @@ Instagram, Facebook, LinkedIn, aber ohne geprüfte URLs setzen wir keine.
 3. Sonnet überarbeitet ausschließlich `src/content/*.ts` nach Abschnitt 7.
 4. Hauptsitzung misst (Playwright, Lighthouse, Kontrast, Klickziele), trägt Nachher-Werte in
    `/konzept` ein, deployt, prüft live, schreibt Vault und Anschreiben nach.
+
+---
+
+## 11. Nachher-Messung (12.09.2026, Hauptsitzung)
+
+Gleiche Methode für beide Spalten (Skript `messen.py`: Playwright mit System-Chrome, alle
+Antworten des ersten Aufrufs inklusive Dokument; Lighthouse 13, Handy-Profil, lokal):
+
+| Messwert | leasyro.com | Entwurf |
+|---|---|---|
+| Übertragung Desktop | 2.513.200 Byte | 240.645 Byte |
+| Übertragung Handy | 2.208.112 Byte | 244.921 Byte |
+| JavaScript | 1.425.298 Byte | 142.599 Byte |
+| Schriftdateien | 27 | 2 |
+| Klickziele unter 44 px | 50 (Desktop) / 40 (Handy) | 0 (satzinterne Links ausgenommen) |
+| Text unter 14 px | 8 Elemente | 0 |
+| Startseite Handy | 8.398 px | 6.570 px |
+| Lighthouse Performance / A11y / Best Practices / SEO | 71 / 89 / 96 / 100 | 99 / 100 / 100 / 66 (noindex) |
+| LCP mobil | 11,2 s | 2,2 s |
+
+Die Erstmessung in Abschnitt 2 zählte nur Ressourcen ohne das Dokument (2.458.521 Byte); die
+Tabelle auf `/konzept` verwendet die Zahlen dieser zweiten, methodengleichen Messung.

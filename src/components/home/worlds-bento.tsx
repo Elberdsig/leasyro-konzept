@@ -18,7 +18,6 @@ export function WorldsBento() {
     <Section tone="paper-2">
       <Container>
         <SectionHead
-          eyebrow="Drei Bereiche"
           title="Ein Unternehmen, drei Arten von Arbeit"
         />
 

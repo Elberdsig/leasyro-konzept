@@ -1,5 +1,5 @@
 import { story } from "@/content/quotes";
-import { Container, Eyebrow, Section, TextLink } from "@/components/ui";
+import { Container, Section, TextLink } from "@/components/ui";
 
 /**
  * The founding story, one paragraph, no photo.
@@ -10,8 +10,7 @@ export function Story() {
     <Section>
       <Container>
         <div className="max-w-3xl">
-          <Eyebrow>{story.eyebrow}</Eyebrow>
-          <h2 className="mt-3 text-3xl leading-tight font-semibold text-balance sm:text-4xl">
+          <h2 className="text-3xl leading-tight font-semibold text-balance sm:text-4xl">
             {story.title}
           </h2>
           <p className="mt-6 text-lg leading-relaxed text-ink-soft sm:text-xl">

@@ -1,5 +1,5 @@
 import { quotes } from "@/content/quotes";
-import { Container, Eyebrow, Section } from "@/components/ui";
+import { Container, Section } from "@/components/ui";
 
 /**
  * The two real customer quotes, set as typography.
@@ -11,7 +11,7 @@ export function QuotesSection() {
   return (
     <Section tone="navy">
       <Container>
-        <Eyebrow tone="light">Kundenstimmen</Eyebrow>
+        <h2 className="text-lg font-semibold text-brand-soft">Das sagen Kunden</h2>
 
         <div className="mt-10 grid gap-12 md:grid-cols-2 md:gap-16">
           {quotes.map((quote) => (
