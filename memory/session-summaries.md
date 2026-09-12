@@ -25,3 +25,15 @@ gegengeprüft: „Software Developer" steht unter den drei offenen Stellen, nich
 inaktiven. Danach neu deployt, Lighthouse gegen die Live-Seite: 100/100/100/66, LCP 0,9 s.
 Anschreiben auf die Live-Zahlen gebracht (rund 2,5 MB statt 2,46, Lighthouse ergänzt).
 Zählung verschickte Bewerbungen weiterhin **0**, das entscheidet Elberd.
+
+## 12.09.2026, 17:55 bis 19:40 — zweiter Durchgang auf Elberds Wunsch („alles verbessern, eigene Idee")
+Vorab skills.sh (meistinstallierter Design-Skill: Vercels web-design-guidelines, ins Repo unter
+`docs/web-interface-guidelines.md`) und awwwards gesichtet; von dort nur übernommen, was zur
+B2B-Zielgruppe passt (Typohierarchie, Weißraum, sparsame, begründete Bewegung), nicht die
+Agentur-Effekte. Drei Agenten parallel mit disjunkten Dateilisten: Opus A (Rechner, Bewegung,
+Konzept-Sektionen, Audit mit 16 Befunden), Opus B (27 Vitest-Tests, GitHub Actions mit Lighthouse,
+README), Sonnet (fünf Ideen, Zeitleiste, Prüfungen). Zwei echte Fehler nur durch Messung gefunden:
+(1) Einblendung mit Deckkraft ließ vier Kontrast-Audits durchfallen, jetzt nur noch Hub;
+(2) die CI zeigte 440 ms Blockierzeit durch die React-Hydration des Rechners, Umbau auf
+Server-Komponente plus 1.355-Byte-Skript, kein `"use client"` mehr. Lighthouse-CI auf Median aus
+drei Läufen, Performance-Schwelle 0,90 (Runner-Varianz 85 bis 99 gemessen). Live geprüft.

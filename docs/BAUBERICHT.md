@@ -629,13 +629,17 @@ Lokal gegen `npx next start -p 3013` auf dem Produktions-Build, Lighthouse im Ha
 | HTML + JS + CSS | 176.331 Byte | 178.330 Byte | 176.530 Byte |
 | Dateien mit `"use client"` in `src/` | 1 | 0 | 0 |
 
-Die lokalen Zahlen sind ehrlich betrachtet **innerhalb des Rauschens**: der Rechner ist auf einem
-schnellen Mac so billig, dass sich 350 ms CI-Arbeit hier nicht zeigen. Vorher war die Messung
-stabil (dreimal exakt 30 ms), nachher schwankt sie zwischen 16 und 66 ms; der Median fällt leicht,
-der Score steigt von 98 auf 99 bis 100. Belastbar ist nicht der Millisekundenwert, sondern der
-Aufbau: die Seite hat keine Client-Komponente mehr und ist damit gebaut wie die drei Seiten, die in
-der CI 98 bis 99 stehen. Ob die 440 ms wirklich verschwinden, entscheidet der nächste CI-Lauf, und
-das ist der Wert, der zählt.
+Nach dem letzten Build (mit den fertigen Kommentaren) dreimal zur Abnahme gemessen, stabil:
+**Performance 100 · 100 · 100**, TBT 29 · 27 · 27 ms, Skriptauswertung 201 · 199 · 204 ms. Vorher
+lag dieselbe Messung bei 98 · 98 · 98 und 30 · 30 · 30 ms bei 206 ms Skriptauswertung.
+
+Der lokale Gewinn ist **klein, aber wiederholbar**: zwei Punkte im Score (98 auf 100) und rund
+3 ms weniger Blockierzeit. Die Streuung der Läufe 1 bis 8 (16 bis 66 ms) stammt aus paralleler
+Last auf demselben Rechner; die drei Abnahme-Läufe auf einer ruhigen Maschine liegen dicht
+beieinander. Auf einem schnellen Mac ist der Rechner einfach zu billig, damit sich 350 ms
+CI-Arbeit zeigen könnten. Belastbar ist deshalb nicht der Millisekundenwert, sondern der Aufbau:
+die Seite hat keine Client-Komponente mehr und ist damit gebaut wie die drei Seiten, die in der CI
+bei 98 bis 99 stehen. Ob die 440 ms wirklich verschwinden, entscheidet der nächste CI-Lauf.
 
 ### Gegenprobe, damit die Messung den Fehler sehen könnte
 
@@ -655,10 +659,9 @@ das ist der Wert, der zählt.
 
 ### Was offen ist
 
-1. **Der CI-Lauf ist der Beweis.** Lokal ist die Verbesserung nicht messbar, weil die Maschine zu
-   schnell ist. Erst der Lighthouse-Job mit vierfacher Drosselung sagt, ob die Startseite jetzt
-   bei den anderen Seiten liegt. Bis dahin ist die Zahl 440 ms unverändert der letzte gemessene
-   Stand.
+1. **Der CI-Lauf ist der Beweis.** Lokal sind nur zwei Punkte Score zu sehen, weil die Maschine
+   zu schnell ist. Erst der Lighthouse-Job mit vierfacher Drosselung sagt, ob die Startseite
+   jetzt bei den anderen Seiten liegt. Bis dahin bleibt 440 ms der letzte dort gemessene Stand.
 2. **Das Skript ist nicht getestet.** Vitest läuft ohne DOM, der Skripttext ist eine Zeichenkette
    in einer TSX-Datei. Geprüft wird er heute nur im Browser, von Hand. Wer das absichern will,
    braucht jsdom oder einen Playwright-Test in der CI.
