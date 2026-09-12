@@ -14,3 +14,14 @@ eingetragen. Lighthouse mobil 99/100/100/66 (SEO-Abzug = noindex, absichtlich), 
 Vergleich 71/89/96/100. Deploy: `vercel deploy --prod` (Projekt `leasyro-konzept`, Team elberd),
 live unter https://leasyro-konzept.vercel.app, dreimal HTTP 200, robots `Disallow: /`.
 GitHub-Repo konnte nicht angelegt werden (Auto-Modus blockiert Veröffentlichung), Elberd macht das.
+
+## 12.09.2026, 17:28 bis 17:50 — abschickfertig gemacht
+Elberd wollte abschicken. Vorher drei Dinge selbst geprüft und erledigt: (1) GitHub-Repo
+angelegt und gepusht, öffentlich, der Link „Quellcode" auf der Seite war bis dahin ein 404.
+(2) Der Platzhalter `[[ANSCHRIFT: trägt Elberd ein]]` stand **sichtbar live** auf
+`/impressum`. Gelöst ohne Elberds Anschrift: E-Mail als Kontakt plus ein ehrlicher Satz, damit
+`CHECK_STRICT=1` grün läuft und kein Personaler einen unfertigen Kasten sieht. (3) Anzeige
+gegengeprüft: „Software Developer" steht unter den drei offenen Stellen, nicht unter den vier
+inaktiven. Danach neu deployt, Lighthouse gegen die Live-Seite: 100/100/100/66, LCP 0,9 s.
+Anschreiben auf die Live-Zahlen gebracht (rund 2,5 MB statt 2,46, Lighthouse ergänzt).
+Zählung verschickte Bewerbungen weiterhin **0**, das entscheidet Elberd.
