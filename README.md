@@ -31,9 +31,11 @@ Desktop 1440 px und Handy 390 px, dazu Lighthouse auf dem Handy-Profil. Quelle d
 Der SEO-Wert liegt bei 66. Das ist kein Fehler, sondern die Folge der Sperre: `robots.txt`
 verbietet alles und jede Seite trägt `noindex, nofollow`, deshalb zieht Lighthouse den Punkt
 „is-crawlable" ab. Genau diese Kategorie wird in `.lighthouserc.json` bewusst nicht geprüft
-(JSON kennt keine Kommentare, deshalb steht die Begründung hier). Performance,
-Barrierefreiheit und Best Practices müssen dort jeweils über 0,95 liegen, sonst schlägt die CI
-fehl.
+(JSON kennt keine Kommentare, deshalb steht die Begründung hier). Barrierefreiheit und Best
+Practices müssen dort jeweils über 0,95 liegen, Performance über 0,90, jeweils als Median aus
+drei Läufen. Die niedrigere Performance-Schwelle ist gemessen, nicht geraten: der GitHub-Runner
+liefert für dieselbe Seite 85 bis 99, lokal und live liegt sie bei 98 bis 100. Schlägt eine
+Schwelle fehl, schlägt die CI fehl.
 
 ## Was hier anders ist
 

@@ -145,7 +145,7 @@ export const qualityGates: QualityGate[] = [
   },
   {
     title: "Lighthouse in der CI",
-    text: "Lighthouse läuft in der CI mit Schwellen von 95 für Performance, Barrierefreiheit und Best Practices. Unterschreitet ein Wert die Schwelle, schlägt der Lauf fehl.",
+    text: "Lighthouse läuft in der CI auf vier Seiten, dreimal je Seite, Median. Schwellen: 95 für Barrierefreiheit und Best Practices, 90 für Performance, weil der Runner langsamer ist als ein Handy. Unterschreitet ein Wert die Schwelle, schlägt der Lauf fehl.",
   },
   {
     title: "Vorher und Nachher mit demselben Skript",

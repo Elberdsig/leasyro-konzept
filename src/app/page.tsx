@@ -30,9 +30,13 @@ export const metadata: Metadata = {
  * (form left, result right) · text list · quote band · single column story ·
  * contact band.
  *
- * The calculator is the only interactive part of the site. Its appointment
- * button is built here, in a server component, and handed down as a prop: that
- * keeps next/link and the Phosphor icon out of the client bundle.
+ * The calculator is the only interactive part of the site, and it is a server
+ * component too: the first result is rendered here, a small script without any
+ * dependency wires the controls. No file under src/ carries the client
+ * directive, so this page hydrates exactly as much as the three pages that
+ * have no calculator. Its appointment button is built here and handed down
+ * as a prop, which keeps the markup of the section free of next/link and the
+ * Phosphor icon.
  */
 
 /**

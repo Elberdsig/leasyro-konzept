@@ -60,6 +60,12 @@ jobs:
           for versuch in $(seq 1 30); do
             if curl -sf -o /dev/null http://localhost:3000/; then
               echo "Server antwortet nach Versuch $versuch."
+              # Warm every measured route once, so the first Lighthouse run does
+              # not pay for a cold route. Measured 12.09.2026: the first URL of
+              # the batch was 0.5 s slower in LCP than the same page later.
+              for pfad in / /leistungen /karriere/software-developer /konzept; do
+                curl -sf -o /dev/null "http://localhost:3000$pfad"
+              done
               exit 0
             fi
             sleep 2

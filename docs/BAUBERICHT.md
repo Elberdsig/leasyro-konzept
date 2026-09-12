@@ -573,3 +573,96 @@ Werte nach dem zweiten Durchgang (lokal, Handy-Profil): Startseite Performance 9
 Byte (davon 4.350 für den Rechner), 2 Schriftdateien, 0 Klickziele unter 44 px, Startseite auf
 dem Handy 7.990 px (der Rechner ist 1.420 px davon; die Live-Seite hat 8.398 px ohne einen
 solchen Baustein). Konsole ohne Meldung, keine Hydrations-Warnung.
+
+## Dritter Durchgang, 12.09.2026: Rechner ohne React-Hydration
+
+### Warum
+
+Die CI misst mit Lighthouse im Handy-Profil auf einem langsamen Runner (vierfache
+CPU-Drosselung). Dort steht die Startseite bei Performance 85 und **Total Blocking Time 440 ms**,
+die drei Seiten ohne Client-Komponente bei 98 bis 99 und 60 bis 90 ms. Der einzige Unterschied war
+`src/components/home/effort-calculator.tsx` mit `"use client"`. Die Arbeit, die dort 350 ms kostet,
+ist nicht das Rechnen, sondern das Hydrieren: React muss den Baustein im Browser ein zweites Mal
+aufbauen, bevor ein Schieber reagiert.
+
+### Was
+
+Der Rechner ist jetzt eine Server-Komponente. Das Markup ist dasselbe wie vorher, nur mit drei
+Haken für das Skript: `data-rechner` auf der Sektion (der Wert ist die Zahl der Arbeitswochen,
+46, aus `src/content/calculator.ts`), `data-feld` je Zeile, `data-ergebnis` auf den beiden
+Zahlen. Aus den Eingaben wurden `defaultValue`-Felder, das erste Ergebnis rechnet der Server.
+
+Die Bedienung macht ein Vanilla-Skript ohne Abhängigkeit, **1.355 Byte** Quelltext, eingebettet
+als letztes Element der Sektion. Es liest Grenzen und Schrittweite aus den `min`-, `max`- und
+`step`-Attributen, die sowieso im Markup stehen, und die Arbeitswochen aus `data-rechner`; keine
+Zahl steht zweimal im Projekt. Formatiert wird mit `Intl.NumberFormat("de-DE")`, dasselbe wie auf
+dem Server, das Eurozeichen mit geschütztem Leerzeichen von Hand.
+
+**Abweichung vom Auftrag, mit Messung begründet:** vorgesehen war `next/script` mit
+`strategy="afterInteractive"`. Dieser Weg erreicht das Ziel nicht. `next/dist/client/script.js`
+trägt selbst `'use client'`, liefert im App-Router für ein Inline-Skript auf dem Server `null`
+zurück und schiebt den Code erst in einem `useEffect` in die Seite. Die Seite behält damit eine
+Client-Grenze, und der Rechner wird erst nach der Hydration bedienbar. Gemessen wurde beides:
+mit `next/script` blieb die Startseite bei Performance 98 und TBT 29 bis 32 ms, also genau auf dem
+Stand von vorher, und die Übertragung wuchs um 1.999 Byte, weil der Skripttext als Prop im
+RSC-Strom mitfährt. Das fertige Markup benutzt deshalb ein einfaches `<script>`-Element mit
+`dangerouslySetInnerHTML` (der Inhalt ist eine Konstante aus dieser Datei, keine Eingabe). Die
+Begründung steht auch im Code, an der Stelle, an der `<Script>` gestanden hätte.
+
+Nebenbefund: `euro()` behauptete im Kommentar ein geschütztes Leerzeichen, hatte aber ein
+normales (U+0020). Erst der Vergleich von Server-Text und Skript-Text hat das gezeigt: der Server
+schrieb „57.960 €" mit normalem, das Skript mit geschütztem Leerzeichen. Jetzt steht an beiden
+Stellen die Escape-Form `\u00a0`.
+
+### Messwerte, selbst gemessen
+
+Lokal gegen `npx next start -p 3013` auf dem Produktions-Build, Lighthouse im Handy-Profil
+(`CHROME_PATH` auf System-Chrome, `--headless=new`), Bytes über
+`performance.getEntriesByType('resource')` plus Navigation bei 390 px Breite.
+
+| Messung | vorher (Client-Komponente) | mit `next/script` | nachher (Server + Inline-Skript) |
+|---|---|---|---|
+| Performance-Score, 3 Läufe | 98 · 98 · 98 | 98 · 98 · 98 | 99 · 100 · 97 (fünf weitere: 99 · 100 · 99 · 100 · 99) |
+| Total Blocking Time | 30 · 30 · 30 ms | 29 · 30 · 32 ms | 16 · 26 · 66 ms (weitere: 18 · 48 · 32 · 48 · 26) |
+| JavaScript-Übertragung | 154.170 Byte | 154.435 Byte | 152.153 Byte |
+| HTML-Übertragung | 14.953 Byte | 16.670 Byte | 17.152 Byte |
+| HTML + JS + CSS | 176.331 Byte | 178.330 Byte | 176.530 Byte |
+| Dateien mit `"use client"` in `src/` | 1 | 0 | 0 |
+
+Die lokalen Zahlen sind ehrlich betrachtet **innerhalb des Rauschens**: der Rechner ist auf einem
+schnellen Mac so billig, dass sich 350 ms CI-Arbeit hier nicht zeigen. Vorher war die Messung
+stabil (dreimal exakt 30 ms), nachher schwankt sie zwischen 16 und 66 ms; der Median fällt leicht,
+der Score steigt von 98 auf 99 bis 100. Belastbar ist nicht der Millisekundenwert, sondern der
+Aufbau: die Seite hat keine Client-Komponente mehr und ist damit gebaut wie die drei Seiten, die in
+der CI 98 bis 99 stehen. Ob die 440 ms wirklich verschwinden, entscheidet der nächste CI-Lauf, und
+das ist der Wert, der zählt.
+
+### Gegenprobe, damit die Messung den Fehler sehen könnte
+
+1. **Alle sieben Framework-Chunks blockiert** (`page.route("**/_next/static/chunks/**.js", abort)`):
+   fünfmal Pfeil rechts auf dem ersten Schieber ergibt weiter 2.346 Stunden und 82.110 €. React
+   startet in diesem Lauf nie. Die alte Fassung wäre hier tot gewesen. Das ist der eigentliche
+   Beweis, nicht der Score.
+2. **Ohne JavaScript** (`java_script_enabled=False`): 1.656 Stunden und 57.960 € stehen im HTML.
+3. **Bedienung in echtem Chrome bei 390 px**: Tastatur (fünfmal Pfeil rechts, 12 wird 17, 2.346
+   Stunden / 82.110 €), Tippen 50 / 2,5 / 60 (5.750 Stunden / 345.000 €, Schieber folgt auf 2.5),
+   Eingabe 500 im ersten Feld wird sofort auf 200 begrenzt (23.000 Stunden / 1.380.000 €),
+   Stundensatz 0 zeigt während des Tippens 0 € und springt beim Verlassen des Feldes auf die
+   Untergrenze 15. Beide `aria-live`-Bereiche und der Satz über die 46 Arbeitswochen stehen
+   unverändert. `page.on("console")` und `page.on("pageerror")`: keine einzige Meldung.
+4. `npm run lint`, `npm test` (27 grün), `CHECK_STRICT`-freier `npm run check`, `npm run build`
+   (13 Routen, 0 Warnungen).
+
+### Was offen ist
+
+1. **Der CI-Lauf ist der Beweis.** Lokal ist die Verbesserung nicht messbar, weil die Maschine zu
+   schnell ist. Erst der Lighthouse-Job mit vierfacher Drosselung sagt, ob die Startseite jetzt
+   bei den anderen Seiten liegt. Bis dahin ist die Zahl 440 ms unverändert der letzte gemessene
+   Stand.
+2. **Das Skript ist nicht getestet.** Vitest läuft ohne DOM, der Skripttext ist eine Zeichenkette
+   in einer TSX-Datei. Geprüft wird er heute nur im Browser, von Hand. Wer das absichern will,
+   braucht jsdom oder einen Playwright-Test in der CI.
+3. **Die Zahl 46 steht jetzt in einem Attribut.** Wer `weeksPerYear` ändert, ändert Server-Text
+   und Skript in einem Schritt, das ist beabsichtigt. Wer aber das Attribut aus dem Markup
+   entfernt, bricht das Skript still: es findet die Wurzel nicht und tut nichts. Ein Test darauf
+   fehlt.
