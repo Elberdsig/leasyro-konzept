@@ -1,26 +1,129 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/*
+  leasyro, Konzept-Entwurf. Design tokens.
+
+  Palette rationale: the brand colour of the live site is Bootstrap blue
+  (#0d6efd) on white. That blue carries 4.50 : 1 on white, which is enough for
+  a fill but leaves no room for a link, a hover state or a slightly tinted
+  ground. So the blue keeps its job as a surface and large mark, and a darker
+  sibling (brand-ink) does all the work that involves letters. The navy of the
+  live hero (#19348F) stays as the quiet accent for quotes and the footer.
+
+  Measured 12.09.2026 with scripts/check-contrast.mjs, against every ground a
+  text can land on (paper #ffffff / paper-2 #f4f6fa / brand-soft #e7f0ff):
+
+    ink        #12172a   17.77 / 16.42 / 15.49 : 1   headlines and body
+    ink-soft   #474f60    8.22 /  7.60 /  7.16 : 1   secondary text, AAA
+    ink-faint  #5f6878    5.62 /  5.19 /  4.90 : 1   labels, AA everywhere
+    brand-ink  #0a58ca    6.44 /  5.95 /  5.61 : 1   links and buttons
+    white on brand-ink     6.44 : 1                  button label
+    white on navy         10.89 : 1                  footer and quote band
+    white on ink          17.77 : 1
+
+  One deviation from docs/KONZEPT.md section 4: ink-soft was specified as
+  #4b5567. That value is AAA on paper (7.51 : 1) but drops to 6.95 : 1 on
+  paper-2, and secondary text sits on paper-2 in three sections. Darkened one
+  step to #474f60 so the same token is AAA on every ground it can land on.
+
+  brand (#0d6efd) is never used for small text. The three area accents
+  (humafix / benboehm / lena) are never used for text at all, only as a rule
+  above their cell, so they are not part of the contrast check.
+*/
+
+@theme {
+  --color-paper: #ffffff;
+  --color-paper-2: #f4f6fa;
+
+  --color-ink: #12172a;
+  --color-ink-soft: #474f60;
+  --color-ink-faint: #5f6878;
+
+  --color-brand: #0d6efd;
+  --color-brand-ink: #0a58ca;
+  --color-brand-soft: #e7f0ff;
+  --color-navy: #19348f;
+
+  --color-line: #d9dee8;
+
+  /* Area accents, decoration only, never text. Source: the three brands. */
+  --color-accent-humafix: #8b5cf6;
+  --color-accent-benboehm: #0d6efd;
+  --color-accent-lena: #95575c;
+
+  --font-sans: var(--font-poppins), ui-sans-serif, system-ui, sans-serif;
+
+  --radius-card: 12px;
+  --radius-btn: 6px;
+  --radius-pill: 999px;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    /* Anchor targets on /leistungen must clear the sticky header. */
+    scroll-padding-top: 7rem;
+  }
+
+  body {
+    background: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  ::selection {
+    background: var(--color-brand-soft);
+    color: var(--color-ink);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-brand-ink);
+    outline-offset: 3px;
+  }
+
+  /*
+    No entry animation anywhere, and headlines in particular hang on nothing.
+    A fade that never advances (background tab, restored session, prerender)
+    leaves the most important element of the page at opacity 0. Movement only
+    happens on hover and focus, where it cannot hide content.
+  */
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer utilities {
+  /* Small uppercase label above a headline. */
+  .eyebrow {
+    /* 14px, not 12px. This draft criticises the live site for 12px labels,
+       so it must not ship any itself. Measured 12.09.2026: with this value
+       no text on any page falls below 14px. */
+    font-size: 0.875rem;
+    font-weight: 600;
+    line-height: 1;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  /* Every interactive element keeps a 44px touch target, also on mobile. */
+  .tap {
+    min-height: 44px;
+    min-width: 44px;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* The mobile menu is a native popover, so it needs a plain backdrop. */
+[popover]::backdrop {
+  background: rgba(18, 23, 42, 0.45);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
 }

@@ -6,9 +6,13 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "check:contrast": "node scripts/check-contrast.mjs",
+    "check:copy": "node scripts/check-copy.mjs",
+    "check": "npm run check:contrast && npm run check:copy"
   },
   "dependencies": {
+    "@phosphor-icons/react": "^2.1.10",
     "next": "16.3.5",
     "react": "19.2.8",
     "react-dom": "19.2.8"
